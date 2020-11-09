@@ -6,11 +6,22 @@
  * User Manual available at https://docs.gradle.org/6.6.1/userguide/tutorial_java_projects.html
  */
 
-plugins {
-    // Apply the java plugin to add support for Java
-    id 'java'
-    id 'maven-publish'
+buildscript {
+    repositories {
+        jcenter()
+
+    }
+    dependencies {
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+    }
 }
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
+
 
 repositories {
     // Use jcenter for resolving dependencies.
@@ -21,20 +32,42 @@ repositories {
 version = "${version}"
 group = "${group}"
 
+ext {
+    artifactoryUsername = System.properties['ARTIFACTORY_USERNAME']
+    artifactoryPassword = System.properties['ARTIFACTORY_PASSWORD']
+}
+
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Optum-dev-days-2020/user-management")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
-    publications {
-        gpr(MavenPublication) {
-            from(components.java)
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+    publish {
+        repository {
+            repoKey = 'user-management-service'
+            username = "${artifactoryUsername}"
+            password = "${artifactoryPassword}"
+            maven = true
+
+        }
+        defaults {
+            publications('mavenJava')
+            publishArtifacts = true
+            publishPom = true
+        }
+    }
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+            username = "${artifactoryUsername}"
+            password = "${artifactoryPassword}"
+            maven = true
+
         }
     }
 }
