@@ -25,6 +25,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Publish the Artifact
-      run: ./gradlew publish
+      run: ./gradlew artifactoryPublish
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+        ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
