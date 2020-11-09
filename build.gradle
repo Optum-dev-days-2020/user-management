@@ -33,8 +33,8 @@ version = "${version}"
 group = "${group}"
 
 ext {
-    artifactoryUsername = System.properties['ARTIFACTORY_USERNAME']
-    artifactoryPassword = System.properties['ARTIFACTORY_PASSWORD']
+    artifactoryUsername = System.getenv('ARTIFACTORY_USERNAME')
+    artifactoryPassword = System.getenv('ARTIFACTORY_PASSWORD')
 }
 
 publishing {
